@@ -614,7 +614,6 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 	if (pFrameInfo)
     {
         CBasicDemoDlg *pBasicDemo = (CBasicDemoDlg*)pUser;
-		pBasicDemo->MessageBox(TEXT("image callback called!!!!!"));
         if (MV_Image_Undefined == pBasicDemo->m_nSaveImageType || NULL == pData)
         {
             return;
