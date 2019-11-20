@@ -6,7 +6,11 @@
 #include "BasicDemoCallback.h"
 #include "BasicDemoCallbackDlg.h"
 #include <iostream>
-
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/video/video.hpp>
+#pragma comment(lib,"opencv_world341.lib")
+#include "MvGigEDevice.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -614,12 +618,14 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 	if (pFrameInfo)
     {
         CBasicDemoDlg *pBasicDemo = (CBasicDemoDlg*)pUser;
-        if (MV_Image_Undefined == pBasicDemo->m_nSaveImageType || NULL == pData)
+		cv::Mat src;
+		if (MV_Image_Undefined == pBasicDemo->m_nSaveImageType || NULL == pData)
         {
             return;
         }
-
         // 设置对应的相机参数
+
+		pBasicDemo->MessageBox(TEXT("imageCallBack"));
 
         // 仅在第一次保存图像时申请缓存，在 CloseDevice 时释放
         if (NULL == pBasicDemo->m_pBufForSaveImage)
@@ -634,6 +640,9 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
             }
         }
 
+		src = cv::Mat(pFrameInfo->nHeight, pFrameInfo->nWidth, CV_8UC3, pData);
+		cv::imshow("img dispaly",src);
+		cv::waitKey(0);
         MV_SAVE_IMAGE_PARAM_EX stParam = {0};
         stParam.enImageType = pBasicDemo->m_nSaveImageType; // 需要保存的图像类型
         stParam.enPixelType = pFrameInfo->enPixelType;  // 相机对应的像素格式

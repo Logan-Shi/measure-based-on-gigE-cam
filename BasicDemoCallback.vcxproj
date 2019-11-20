@@ -22,6 +22,7 @@
     <ProjectGuid>{96B023D7-3943-460A-B18D-4BFAF9C60F39}</ProjectGuid>
     <RootNamespace>BasicDemo</RootNamespace>
     <Keyword>MFCProj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -73,21 +74,29 @@
     <OutDir>..\..\..\..\Dlls\win32\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>D:\opencv-3.4.1\opencv\build\include\opencv2;D:\opencv-3.4.1\opencv\build\include\opencv;D:\opencv-3.4.1\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\opencv-3.4.1\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>..\..\..\..\Dlls\win64\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>D:\opencv-3.4.1\opencv\build\include\opencv2;D:\opencv-3.4.1\opencv\build\include\opencv;D:\opencv-3.4.1\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\opencv-3.4.1\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\..\..\..\Dlls\win32\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>D:\opencv-3.4.1\opencv\build\include\opencv2;D:\opencv-3.4.1\opencv\build\include\opencv;D:\opencv-3.4.1\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\opencv-3.4.1\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>..\..\..\..\Dlls\win64\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>D:\opencv-3.4.1\opencv\build\include\opencv2;D:\opencv-3.4.1\opencv\build\include\opencv;D:\opencv-3.4.1\opencv\build\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\opencv-3.4.1\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -112,7 +121,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>MvCameraControl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MvCameraControl.lib;opencv_world341d.lib;opencv_world341.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\Dlls\win32\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\Libraries\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -145,7 +154,7 @@
     <Link>
       <AdditionalDependencies>MvCameraControl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\Dlls\win64\BasicDemoCallback_VC.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\..\Libraries\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\Libraries\win64;opencv_world341d.lib;opencv_world341.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
@@ -175,7 +184,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>MvCameraControl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MvCameraControl.lib;opencv_world341d.lib;opencv_world341.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\Dlls\win32\BasicDemoCallback_VC.exe</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\Libraries\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -211,7 +220,7 @@
     <Link>
       <AdditionalDependencies>MvCameraControl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\Dlls\win64\BasicDemoCallback_VC.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\..\Libraries\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\..\..\Libraries\win64;opencv_world341d.lib;opencv_world341.lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

@@ -146,7 +146,7 @@ int     CMyCamera::RegisterImageCallBack(void(__stdcall* cbOutput)(unsigned char
         return MY_FAIL;
     }
 
-    return MV_CC_RegisterImageCallBackEx(m_hDevHandle, cbOutput, pUser);
+    return MV_CC_RegisterImageCallBackForRGB(m_hDevHandle, cbOutput, pUser);
 }
 
 
