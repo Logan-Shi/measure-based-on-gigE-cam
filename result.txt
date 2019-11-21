@@ -1,0 +1,44 @@
+measurement: 
+--------------------------------
+detect 1 circle(s) as following
+circle 0: center is [248, 210] radius is 46
+detected 7 lines as following
+line 0 point 1 is (265,124)
+       point 2 is (470,284)
+line 1 point 1 is (173,282)
+       point 2 is (173,170)
+line 2 point 1 is (280,286)
+       point 2 is (445,286)
+line 3 point 1 is (207,285)
+       point 2 is (297,285)
+line 4 point 1 is (234,101)
+       point 2 is (322,169)
+line 5 point 1 is (174,169)
+       point 2 is (174,92)
+line 6 point 1 is (205,79)
+       point 2 is (271,130)
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s) as following
+circle 0: center is [248, 210] radius is 46
+detected 7 lines as following
+line 0 point 1 is (265,124)
+       point 2 is (470,284)
+line 1 point 1 is (173,282)
+       point 2 is (173,170)
+line 2 point 1 is (280,286)
+       point 2 is (445,286)
+line 3 point 1 is (207,285)
+       point 2 is (297,285)
+line 4 point 1 is (234,101)
+       point 2 is (322,169)
+line 5 point 1 is (174,169)
+       point 2 is (174,92)
+line 6 point 1 is (205,79)
+       point 2 is (271,130)
+measurement finished
+--------------------------------
+
