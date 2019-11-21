@@ -741,57 +741,78 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 			}
 		}
 
-		/* step 0: read img data */
-		src = cv::Mat(pFrameInfo->nHeight, pFrameInfo->nWidth, CV_8UC3, pData);
-		//cv::Mat src = cv::imread("D:\\curricula\\测试\\课程设计-视觉测量\\示例图片\\1.bmp");
+		MV_SAVE_IMAGE_PARAM_EX stParam = { 0 };
+		stParam.enImageType = pBasicDemo->m_nSaveImageType; // 需要保存的图像类型
+		stParam.enPixelType = pFrameInfo->enPixelType;  // 相机对应的像素格式
+		stParam.nBufferSize = pBasicDemo->m_nBufSizeForSaveImage;  // 存储节点的大小
+		stParam.nWidth = pFrameInfo->nWidth;         // 相机对应的宽
+		stParam.nHeight = pFrameInfo->nHeight;          // 相机对应的高
+		stParam.nDataLen = pFrameInfo->nFrameLen;
+		stParam.pData = pData;
+		stParam.pImageBuffer = pBasicDemo->m_pBufForSaveImage;
+		stParam.nJpgQuality = 80;
 
-		/* step 1: resize for calc efficiency */
-		double scale = 0.2;
-		cv::resize(src, src, cv::Size(src.cols*scale, src.rows*scale), 0, 0, cv::INTER_NEAREST);
-
-		/* step 2: gaussian filter */
-		GaussianBlur(src, src, Size(9, 9), 2, 2);//高斯降噪
-		Mat cimg;
-		cvtColor(src, cimg, COLOR_RGB2GRAY);
-
-		/* step 3: get bi-level img */
-		threshold(cimg, cimg, 100, 255, CV_THRESH_BINARY);
-		imshow("threshold", cimg);
-
-		/* step 4: edge extraction */
-		int canny_threshold = 100;
-		double canny_radio = 2;
-		Canny(cimg, cimg, canny_threshold, canny_radio * canny_threshold, 5);
-		imshow("canny", cimg);
-
-		/* step 5: circle detection */
-		vector<Vec3f> circles;
-		HoughCircles(cimg, circles, HOUGH_GRADIENT, 1, cimg.rows / 8, canny_threshold * 2, 20, 30, 80);
-
-		for (size_t i = 0; i < circles.size(); i++)
+		int nRet = pBasicDemo->m_pcMyCamera->SaveImage(&stParam);
+		if (MV_OK != nRet)
 		{
-			Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-			int radius = cvRound(circles[i][2]);
-			//绘制圆心
-			circle(src, center, 3, Scalar(0, 255, 0), -1, 8, 0);
-			//绘制圆轮廓
-			circle(src, center, radius, Scalar(155, 50, 255), 3, 8, 0);
 		}
-
-		/* step 6: line detection */
-		vector<Vec4i> lines;
-		HoughLinesP(cimg, lines, 1, CV_PI / 180, 50, 50, 10);
-		for (size_t i = 0; i < lines.size(); i++)
+		char pImageName[32] = { 0 };
+		if (NULL == pImageName)
 		{
-			Vec4i l = lines[i];
-			line(src, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 3, CV_AA);
+			return;
 		}
+		if (MV_Image_Bmp == stParam.enImageType)
+		{
+			/* step 0: read img data */
+			src = cv::Mat(pFrameInfo->nHeight, pFrameInfo->nWidth, CV_8UC3, pData);
+			//cv::Mat src = cv::imread("D:\\curricula\\测试\\课程设计-视觉测量\\示例图片\\1.bmp");
 
-		cv::imshow("result", src);
+			/* step 1: resize for calc efficiency */
+			double scale = 0.2;
+			cv::resize(src, src, cv::Size(src.cols*scale, src.rows*scale), 0, 0, cv::INTER_NEAREST);
 
-		/* step 7: write output */
-		ofstream fout;
-		while (1) {
+			/* step 2: gaussian filter */
+			GaussianBlur(src, src, Size(9, 9), 2, 2);//高斯降噪
+			Mat cimg;
+			cvtColor(src, cimg, COLOR_RGB2GRAY);
+
+			/* step 3: get bi-level img */
+			threshold(cimg, cimg, 100, 255, CV_THRESH_BINARY);
+			imshow("threshold", cimg);
+
+			/* step 4: edge extraction */
+			int canny_threshold = 100;
+			double canny_radio = 2;
+			Canny(cimg, cimg, canny_threshold, canny_radio * canny_threshold, 5);
+			imshow("canny", cimg);
+
+			/* step 5: circle detection */
+			vector<Vec3f> circles;
+			HoughCircles(cimg, circles, HOUGH_GRADIENT, 1, cimg.rows / 8, canny_threshold * 2, 20, 30, 80);
+
+			for (size_t i = 0; i < circles.size(); i++)
+			{
+				Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+				int radius = cvRound(circles[i][2]);
+				//绘制圆心
+				circle(src, center, 3, Scalar(0, 255, 0), -1, 8, 0);
+				//绘制圆轮廓
+				circle(src, center, radius, Scalar(155, 50, 255), 3, 8, 0);
+			}
+
+			/* step 6: line detection */
+			vector<Vec4i> lines;
+			HoughLinesP(cimg, lines, 1, CV_PI / 180, 50, 50, 10);
+			for (size_t i = 0; i < lines.size(); i++)
+			{
+				Vec4i l = lines[i];
+				line(src, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 3, CV_AA);
+			}
+
+			cv::imshow("result", src);
+
+			/* step 7: write output */
+			ofstream fout;
 			if (char status = cv::waitKey(0))
 			{
 				switch (status)
@@ -823,58 +844,31 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 					fout << "--------------------------------" << '\n';
 					fout << '\n';
 					fout.close();
-					pBasicDemo->MessageBox(TEXT("recorded result"));
 					cv::destroyAllWindows();
+					pBasicDemo->MessageBox(TEXT("测量已记录"), TEXT("成功"), MB_OK | MB_ICONWARNING);
 					break;
 				default:
-					pBasicDemo->MessageBox(TEXT("bad result, flushed"));
 					cv::destroyAllWindows();
+					pBasicDemo->MessageBox(TEXT("测量未记录"), TEXT("成功"), MB_OK | MB_ICONWARNING);
 					break;
 				}
-				break;
 			}
-		}
-
-		MV_SAVE_IMAGE_PARAM_EX stParam = { 0 };
-		stParam.enImageType = pBasicDemo->m_nSaveImageType; // 需要保存的图像类型
-		stParam.enPixelType = pFrameInfo->enPixelType;  // 相机对应的像素格式
-		stParam.nBufferSize = pBasicDemo->m_nBufSizeForSaveImage;  // 存储节点的大小
-		stParam.nWidth = pFrameInfo->nWidth;         // 相机对应的宽
-		stParam.nHeight = pFrameInfo->nHeight;          // 相机对应的高
-		stParam.nDataLen = pFrameInfo->nFrameLen;
-		stParam.pData = pData;
-		stParam.pImageBuffer = pBasicDemo->m_pBufForSaveImage;
-		stParam.nJpgQuality = 80;
-
-		int nRet = pBasicDemo->m_pcMyCamera->SaveImage(&stParam);
-		if (MV_OK != nRet)
-		{
-		}
-		char pImageName[32] = { 0 };
-		if (NULL == pImageName)
-		{
-			return;
-		}
-		if (MV_Image_Bmp == stParam.enImageType)
-		{
-			sprintf_s(pImageName, 20, "%03d.bmp", pFrameInfo->nFrameNum);
 		}
 		else if (MV_Image_Jpeg == stParam.enImageType)
 		{
 			sprintf_s(pImageName, 20, "%03d.jpg", pFrameInfo->nFrameNum);
-		}
+			pBasicDemo->m_nSaveImageType = MV_Image_Undefined;
+			FILE* fp = fopen(pImageName, "wb");
+			if (NULL == fp)
+			{
+				pBasicDemo->MessageBox(TEXT("fopen failed"));
+				return;
+			}
+			fwrite(pBasicDemo->m_pBufForSaveImage, 1, stParam.nImageLen, fp);
+			fclose(fp);
 
-		pBasicDemo->m_nSaveImageType = MV_Image_Undefined;
-		FILE* fp = fopen(pImageName, "wb");
-		if (NULL == fp)
-		{
-			pBasicDemo->MessageBox(TEXT("fopen failed"));
-			return;
+			pBasicDemo->MessageBox(TEXT("保存成功"), TEXT("成功"), MB_OK | MB_ICONWARNING);
 		}
-		fwrite(pBasicDemo->m_pBufForSaveImage, 1, stParam.nImageLen, fp);
-		fclose(fp);
-
-		pBasicDemo->MessageBox(TEXT("保存成功"), TEXT("成功"), MB_OK | MB_ICONWARNING);
 	}
 }
 

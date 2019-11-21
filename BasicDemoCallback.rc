@@ -16,13 +16,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (P.R.C.) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
-#ifdef _WIN32
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 #pragma code_page(936)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -72,6 +70,7 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\BasicDemoCallback.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
@@ -99,16 +98,15 @@ BEGIN
     PUSHBUTTON      "打开设备",IDC_OPEN_BUTTON,383,57,34,14
     PUSHBUTTON      "关闭设备",IDC_CLOSE_BUTTON,419,57,34,14
     GROUPBOX        "图像采集",IDC_IMAGE_GRABBING_STATIC,373,81,88,68
-    GROUPBOX        "图片保存",IDC_SAVE_IMAGE_STATIC,374,153,87,35
+    GROUPBOX        "工件测量",IDC_SAVE_IMAGE_STATIC,374,153,87,35
     CONTROL         "",IDC_DISPLAY_STATIC,"Static",SS_BLACKFRAME,14,33,351,243
     GROUPBOX        "参数",IDC_PARAMETER_STATIC,374,194,87,82
     CONTROL         "连续模式",IDC_CONTINUS_MODE_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP,379,93,43,10
     CONTROL         "触发模式",IDC_TRIGGER_MODE_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP,419,94,43,10
     PUSHBUTTON      "开始采集",IDC_START_GRABBING_BUTTON,379,107,34,14
     PUSHBUTTON      "停止采集",IDC_STOP_GRABBING_BUTTON,419,107,34,14
-    PUSHBUTTON      "软触发一次",IDC_SOFTWARE_ONCE_BUTTON,417,129,38,14
     CONTROL         "软触发",IDC_SOFTWARE_TRIGGER_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,381,131,33,10
-    PUSHBUTTON      "保存BMP",IDC_SAVE_BMP_BUTTON,381,166,34,14
+    PUSHBUTTON      "测量模式",IDC_SAVE_BMP_BUTTON,381,166,34,14
     PUSHBUTTON      "保存JPG",IDC_SAVE_JPG_BUTTON,420,166,34,14
     EDITTEXT        IDC_EXPOSURE_EDIT,412,205,40,14,ES_AUTOHSCROLL
     EDITTEXT        IDC_GAIN_EDIT,412,223,40,14,ES_AUTOHSCROLL
@@ -119,6 +117,7 @@ BEGIN
     PUSHBUTTON      "参数获取",IDC_GET_PARAMETER_BUTTON,381,258,36,14
     PUSHBUTTON      "参数设置",IDC_SET_PARAMETER_BUTTON,419,258,36,14
     COMBOBOX        IDC_DEVICE_COMBO,14,15,350,77,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "软触发一次",IDC_SOFTWARE_ONCE_BUTTON,417,129,39,14
 END
 
 
@@ -144,13 +143,13 @@ BEGIN
     BEGIN
         BLOCK "080403a8"
         BEGIN
-            VALUE "CompanyName", "TODO: <公司名>"
-            VALUE "FileDescription", "TODO: <文件说明>"
+            VALUE "CompanyName", "szk"
+            VALUE "FileDescription", "课程设计"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "BasicDemo.exe"
-            VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
+            VALUE "LegalCopyright", "szk。保留所有权利。"
             VALUE "OriginalFilename", "BasicDemo.exe"
-            VALUE "ProductName", "TODO: <产品名>"
+            VALUE "ProductName", "课程设计"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END
@@ -167,7 +166,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
@@ -190,15 +189,26 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_BasicDemo_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ABOUTBOX            "关于 BasicDemo(&A)..."
 END
 
-#endif    // Chinese (P.R.C.) resources
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
