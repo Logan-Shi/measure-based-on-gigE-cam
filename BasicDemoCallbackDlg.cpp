@@ -9,13 +9,17 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/video/video.hpp>
-#pragma comment(lib,"opencv_world341.lib")
 #include "MvGigEDevice.h"
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 #ifdef _DEBUG
-#define new DEBUG_NEW
+#pragma comment(lib,"opencv_world341d.lib")
+#else
+#pragma comment(lib,"opencv_world341.lib")
 #endif
 
-
+using namespace cv;
+using namespace std;
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -283,6 +287,7 @@ Status CBasicDemoDlg::DisplayWindowInitial(void)
     {
         return STATUS_ERROR;
     }
+
 
     EnableWindowWhenClose();
     return STATUS_OK;
@@ -640,9 +645,55 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
             }
         }
 
+		/* step 0: read img data */
 		src = cv::Mat(pFrameInfo->nHeight, pFrameInfo->nWidth, CV_8UC3, pData);
-		cv::imshow("img dispaly",src);
-		cv::waitKey(0);
+		//cv::Mat src = cv::imread("D:\\curricula\\测试\\课程设计-视觉测量\\示例图片\\1.bmp");
+
+		/* step 1: resize for calc efficiency */
+		double scale = 0.2;
+		cv::resize(src, src, cv::Size(src.cols*scale, src.rows*scale), 0, 0, cv::INTER_NEAREST);
+
+		/* step 2: gaussian filter */
+		GaussianBlur(src, src, Size(9, 9), 2, 2);//高斯降噪
+		Mat cimg;
+		cvtColor(src, cimg, COLOR_RGB2GRAY);
+
+		/* step 3: get bi-level img */
+		threshold(cimg, cimg, 100, 255, CV_THRESH_BINARY);
+		imshow("threshold", cimg);
+
+		/* step 4: edge extraction */
+		int canny_threshold = 100;
+		double canny_radio = 2;
+		Canny(cimg, cimg, canny_threshold, canny_radio * canny_threshold, 5);
+		imshow("canny", cimg);
+
+		/* step 5: circle detection */
+		vector<Vec3f> circles;
+		HoughCircles(cimg, circles, HOUGH_GRADIENT, 1, cimg.rows / 8, canny_threshold * 2, 20, 30, 80);
+
+		for (size_t i = 0; i < circles.size(); i++)
+		{
+			Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+			int radius = cvRound(circles[i][2]);
+			//绘制圆心  
+			circle(src, center, 3, Scalar(0, 255, 0), -1, 8, 0);
+			//绘制圆轮廓
+			circle(src, center, radius, Scalar(155, 50, 255), 3, 8, 0);
+		}
+
+		/*debug output*/
+		cv::Mat output;
+		output = src;
+		cv::imshow("img dispaly", output);
+		while (1) {
+			if (cv::waitKey(0))
+			{
+				cv::destroyAllWindows();
+				break;
+			}
+		}
+
         MV_SAVE_IMAGE_PARAM_EX stParam = {0};
         stParam.enImageType = pBasicDemo->m_nSaveImageType; // 需要保存的图像类型
         stParam.enPixelType = pFrameInfo->enPixelType;  // 相机对应的像素格式
@@ -681,6 +732,7 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
         }
         fwrite(pBasicDemo->m_pBufForSaveImage, 1, stParam.nImageLen, fp);
         fclose(fp);
+		
         pBasicDemo->MessageBox(TEXT("保存成功"), TEXT("成功"), MB_OK | MB_ICONWARNING);
     }
 }

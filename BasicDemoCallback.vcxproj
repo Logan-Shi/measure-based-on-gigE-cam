@@ -83,6 +83,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>D:\opencv-3.4.1\opencv\build\include\opencv2;D:\opencv-3.4.1\opencv\build\include\opencv;D:\opencv-3.4.1\opencv\build\include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\opencv-3.4.1\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
+    <TargetName>BasicDemoCallback_VC</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>..\..\..\..\Dlls\win32\</OutDir>
@@ -97,6 +98,7 @@
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>D:\opencv-3.4.1\opencv\build\include\opencv2;D:\opencv-3.4.1\opencv\build\include\opencv;D:\opencv-3.4.1\opencv\build\include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\opencv-3.4.1\opencv\build\x64\vc14\lib;$(LibraryPath)</LibraryPath>
+    <TargetName>BasicDemoCallback_VC</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
