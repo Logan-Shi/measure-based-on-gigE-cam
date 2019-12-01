@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by BasicDemoCallback.rc
+// Microsoft Visual C++ 生成的包含文件。
+// 供 BasicDemoCallback.rc 使用
 //
 #define IDM_ABOUTBOX                    0x0010
 #define IDD_ABOUTBOX                    100
@@ -33,6 +33,11 @@
 #define IDC_GAIN_STATIC                 1022
 #define IDC_FRAME_RATE_STATIC           1023
 #define IDC_DISPLAY_STATIC              1024
+#define IDC_FRAME_RATE_EDIT2            1025
+#define IDC_FRAME_RATE_STATIC2          1026
+#define IDC_FRAME_RATE_EDIT3            1027
+#define IDC_FRAME_RATE_STATIC3          1028
+#define IDC_SAVE_JPG_BUTTON2            1029
 
 // Next default values for new objects
 // 
@@ -40,7 +45,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1025
+#define _APS_NEXT_CONTROL_VALUE         1031
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -10,6 +10,7 @@
 #include "MvErrorDefine.h"
 #include "CameraParams.h"
 #include "MvCameraControl.h"
+#include <opencv2/core/core.hpp>
 
 #define MY_OK           0
 #define MY_FAIL         -1
@@ -76,10 +77,11 @@ public:
     // 执行一次Command型命令，如 UserSetSave，详细内容参考SDK安装目录下的 HikCameraNode.xlsx 文件
     int     CommandExecute(IN const char* strKey);
 
+	double _ratio;
+	double _threshold;
 private:
 
     void*               m_hDevHandle;
-
 
 };
 

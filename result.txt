@@ -1,44 +1,206 @@
 measurement: 
 --------------------------------
-detect 1 circle(s) as following
-circle 0: center is [248, 210] radius is 46
-detected 7 lines as following
-line 0 point 1 is (265,124)
-       point 2 is (470,284)
-line 1 point 1 is (173,282)
-       point 2 is (173,170)
-line 2 point 1 is (280,286)
-       point 2 is (445,286)
-line 3 point 1 is (207,285)
-       point 2 is (297,285)
-line 4 point 1 is (234,101)
-       point 2 is (322,169)
-line 5 point 1 is (174,169)
-       point 2 is (174,92)
-line 6 point 1 is (205,79)
-       point 2 is (271,130)
+直线1，2交点：[384.419, 211.366]
+直线1，3交点：[91.8948, 221.639]
+直线2，3交点：[80.2593, -1.69275]
+edge length is respectfully:0.404847mm, 0.513635mm, 0.309315mm.
+circle center to edges height are: 2.10795mm， 0.387175mm， 2.11607mm.
 measurement finished
 --------------------------------
 
 measurement: 
 --------------------------------
-detect 1 circle(s) as following
-circle 0: center is [248, 210] radius is 46
-detected 7 lines as following
-line 0 point 1 is (265,124)
-       point 2 is (470,284)
-line 1 point 1 is (173,282)
-       point 2 is (173,170)
-line 2 point 1 is (280,286)
-       point 2 is (445,286)
-line 3 point 1 is (207,285)
-       point 2 is (297,285)
-line 4 point 1 is (234,101)
-       point 2 is (322,169)
-line 5 point 1 is (174,169)
-       point 2 is (174,92)
-line 6 point 1 is (205,79)
-       point 2 is (271,130)
+edge length is respectfully:0.404847mm, 0.513635mm, 0.309315mm.
+circle center to edges height are: 2.10795mm， 0.387175mm， 2.11607mm.
+radius is: 43measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+edge length is respectfully:20.2423mm, 25.6817mm, 15.4657mm.
+circle center to edges height are: 105.398mm， 19.3588mm， 105.803mm.
+radius is: 29.7372measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+edge length is respectfully:20.2423mm, 25.6817mm, 15.4657mm.
+circle center to edges height are: 105.398mm， 19.3588mm， 105.803mm.
+radius is: 2.97372measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+edge length is respectfully:20.2423mm, 25.6817mm, 15.4657mm.
+circle center to edges height are: 105.398mm， 19.3588mm， 105.803mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 95 lines
+edge length is respectfully:20.2423mm, 25.6817mm, 15.4657mm.
+circle center to edges height are: 105.398mm, 19.3588mm, 105.803mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 40 lines
+edge length is respectfully:20.1456mm, 25.5549mm, 15.3802mm.
+circle center to edges height are: 105.398mm, 19.4264mm, 105.776mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 41 lines
+edge length is respectfully:20.1456mm, 25.5554mm, 15.3805mm.
+circle center to edges height are: 105.398mm, 19.4264mm, 105.773mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 23 lines
+edge length is respectfully:416.573mm, 25.4988mm, 437.208mm.
+circle center to edges height are: 105.398mm, 19.4219mm, -nan(ind)mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 80 lines
+edge length is respectfully:6.90548mm, 26.8652mm, 21.7506mm.
+circle center to edges height are: 105.398mm, 19.4264mm, 9.46762mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 41 lines
+edge length is respectfully:20.1456mm, 25.5554mm, 15.3805mm.
+circle center to edges height are: 105.398mm, 19.4264mm, 105.773mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 41 lines
+edge length is respectfully:20.1456mm, 25.5554mm, 15.3805mm.
+circle center to edges height are: 105.398mm, 19.4264mm, 105.773mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 39 lines
+edge length is respectfully:20.1495mm, 25.5671mm, 15.3806mm.
+circle center to edges height are: 105.418mm, 19.4242mm, 105.815mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 39 lines
+edge length is respectfully:20.1495mm, 25.5671mm, 15.3806mm.
+circle center to edges height are: 105.418mm, 19.4242mm, 105.815mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 67 lines
+edge length is respectfully:25.3442mm, 20.2456mm, 15.2478mm.
+circle center to edges height are: 20.7326mm, 106.377mm, 106.783mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 72 lines
+edge length is respectfully:25.2585mm, 20.1738mm, 15.1963mm.
+circle center to edges height are: 20.7326mm, 106.377mm, 106.76mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 67 lines
+edge length is respectfully:25.3442mm, 20.2456mm, 15.2478mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 67 lines
+edge length is respectfully:25.3442mm, 20.2456mm, 15.2478mm.
+circle center to edges height are: 20.7326mm, 106.377mm, 106.783mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 67 lines
+edge length is respectfully:125.988mm, 175.614mm, 301.603mm.
+circle center to edges height are: 20.7215mm, 20.6956mm, 20.7064mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 67 lines
+edge length is respectfully:25.1977mm, 35.1228mm, 60.3205mm.
+circle center to edges height are: 20.7215mm, 20.6956mm, 20.7064mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 67 lines
+edge length is respectfully:125.988mm, 175.614mm, 301.603mm.
+circle center to edges height are: 20.7215mm, 20.6956mm, 20.7064mm.
+radius is: 2.97372mm
+measurement finished
+--------------------------------
+
+measurement: 
+--------------------------------
+detect 1 circle(s)
+detected 67 lines
+edge length is respectfully:2.51977mm, 3.51228mm, 6.03205mm.
+circle center to edges height are: 0.41443mm, 0.413911mm, 0.414128mm.
+radius is: 2.97372mm
 measurement finished
 --------------------------------
 

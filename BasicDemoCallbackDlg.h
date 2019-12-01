@@ -18,6 +18,8 @@ typedef int Status;
 #define STATUS_OK               0
 #define STATUS_ERROR            -1
 
+//void onChangeTrackbar(int, void*);
+
 // CBasicDemoDlg 对话框
 class CBasicDemoDlg : public CDialog
 {
@@ -69,6 +71,10 @@ private:
     double  m_dGainEdit;
     CEdit   m_ctrlFrameRateEdit;                // 帧率
     double  m_dFrameRateEdit;   
+	CEdit   m_ctrlFrameRateEdit2;                // 帧率
+	double  m_dFrameRateEdit2;
+	CEdit   m_ctrlFrameRateEdit3;                // 帧率
+	double  m_dFrameRateEdit3;
     CButton m_ctrlGetParameterButton;           // 获取参数
     CButton m_ctrlSetParameterButton;           // 设置参数
 
@@ -95,6 +101,8 @@ private:
     Status GetTriggerMode(void);
     Status GetExposureTime(void);               // 设置曝光时间
     Status SetExposureTime(void); 
+	Status SetRatio(void);
+	Status SetThreshold(void);
     Status GetGain(void);                       // 设置增益
     Status SetGain(void);
     Status GetFrameRate(void);                  // 设置帧率
@@ -154,10 +162,7 @@ public:
 public:    
     afx_msg void OnClose();                             // 右上角退出
 
-
 public:
     virtual BOOL PreTranslateMessage(MSG* pMsg);
-
-
-
+	afx_msg void OnBnClickedSaveJpgButton2();
 };

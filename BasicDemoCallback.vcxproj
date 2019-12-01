@@ -266,7 +266,7 @@
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties RESOURCE_FILE="BasicDemoCallback.rc" />
+      <UserProperties _x007B_C5412E06-2E2F-11D3-85BF-00105AC8B715_x007D_="CiSliderX" RESOURCE_FILE="BasicDemoCallback.rc" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

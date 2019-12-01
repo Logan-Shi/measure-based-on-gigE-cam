@@ -25,6 +25,46 @@
 using namespace cv;
 using namespace std;
 
+double g_ratio = 72.3;
+int g_threshold = 100;
+int g_imgNumber = 1;
+
+/// Global Variables
+const int alpha_slider_max = 255;
+int alpha_slider;
+
+/// Matrices to store images
+Mat src;
+
+/**
+ * @function on_trackbar
+ * @brief Callback for trackbar
+ */
+void on_trackbar(int, void*)
+{
+	Rect area(src.cols / 5, src.rows / 6, src.cols / 1.5, src.rows / 1.5);
+	cv::Mat l_src = src(area);
+	/* step 1: resize for calc efficiency */
+	double scale = 0.2;
+	cv::resize(l_src, l_src, cv::Size(l_src.cols*scale, l_src.rows*scale), 0, 0, cv::INTER_NEAREST);
+
+	/* step 2: gaussian filter */
+	GaussianBlur(l_src, l_src, Size(9, 9), 2, 2);//高斯降噪
+	Mat cimg;
+	cvtColor(l_src, cimg, COLOR_RGB2GRAY);
+
+	/* step 3: get bi-level img */
+	int temp = g_threshold;
+	temp = alpha_slider;
+	threshold(cimg, cimg, temp, 255, CV_THRESH_BINARY);
+	imshow("threshold", cimg);
+
+	/* step 4: edge extraction */
+	int canny_threshold = 100;
+	double canny_radio = 2;
+	Canny(cimg, cimg, canny_threshold, canny_radio * canny_threshold, 5);
+	imshow("canny", cimg);
+}
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialog
@@ -57,9 +97,6 @@ END_MESSAGE_MAP()
 
 
 // CBasicDemoDlg 对话框
-
-
-
 
 CBasicDemoDlg::CBasicDemoDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CBasicDemoDlg::IDD, pParent)
@@ -96,6 +133,8 @@ void CBasicDemoDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EXPOSURE_EDIT, m_ctrlExposureEdit);
 	DDX_Control(pDX, IDC_GAIN_EDIT, m_ctrlGainEdit);
 	DDX_Control(pDX, IDC_FRAME_RATE_EDIT, m_ctrlFrameRateEdit);
+	DDX_Control(pDX, IDC_FRAME_RATE_EDIT2, m_ctrlFrameRateEdit2);
+	DDX_Control(pDX, IDC_FRAME_RATE_EDIT3, m_ctrlFrameRateEdit3);
 	DDX_Control(pDX, IDC_GET_PARAMETER_BUTTON, m_ctrlGetParameterButton);
 	DDX_Control(pDX, IDC_SET_PARAMETER_BUTTON, m_ctrlSetParameterButton);
 	DDX_Control(pDX, IDC_CONTINUS_MODE_RADIO, m_ctrlContinusModeRadio);
@@ -105,6 +144,8 @@ void CBasicDemoDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_EXPOSURE_EDIT, m_dExposureEdit);
 	DDX_Text(pDX, IDC_GAIN_EDIT, m_dGainEdit);
 	DDX_Text(pDX, IDC_FRAME_RATE_EDIT, m_dFrameRateEdit);
+	DDX_Text(pDX, IDC_FRAME_RATE_EDIT2, m_dFrameRateEdit2);
+	DDX_Text(pDX, IDC_FRAME_RATE_EDIT3, m_dFrameRateEdit3);
 	DDX_Check(pDX, IDC_SOFTWARE_TRIGGER_CHECK, m_bSoftWareTriggerCheck);
 }
 
@@ -127,6 +168,7 @@ BEGIN_MESSAGE_MAP(CBasicDemoDlg, CDialog)
 	ON_BN_CLICKED(IDC_SAVE_BMP_BUTTON, &CBasicDemoDlg::OnBnClickedSaveBmpButton)
 	ON_BN_CLICKED(IDC_SAVE_JPG_BUTTON, &CBasicDemoDlg::OnBnClickedSaveJpgButton)
 	ON_WM_CLOSE()
+	ON_BN_CLICKED(IDC_SAVE_JPG_BUTTON2, &CBasicDemoDlg::OnBnClickedSaveJpgButton2)
 END_MESSAGE_MAP()
 
 
@@ -292,20 +334,27 @@ Status CBasicDemoDlg::DisplayWindowInitial(void)
 		return STATUS_ERROR;
 	}
 #if _DEBUG
-	/* test code start-----------------------------------------------------*/
-	cv::Mat src = cv::imread("D:\\curricula\\测试\\课程设计-视觉测量\\示例图片\\1.bmp");
+	/// Read image ( same size, same type )
+	src = imread("D:\\curricula\\测试\\课程设计-视觉测量\\相机SDK_免安装\\Dlls\\win64\\001.jpg");
 
+	Rect area(src.cols / 5, src.rows / 6, src.cols / 1.5, src.rows / 1.5);
+	cv::Mat l_src = src(area);
 	/* step 1: resize for calc efficiency */
 	double scale = 0.2;
-	cv::resize(src, src, cv::Size(src.cols*scale, src.rows*scale), 0, 0, cv::INTER_NEAREST);
+	cv::resize(l_src, l_src, cv::Size(l_src.cols*scale, l_src.rows*scale), 0, 0, cv::INTER_NEAREST);
 
 	/* step 2: gaussian filter */
-	GaussianBlur(src, src, Size(9, 9), 2, 2);//高斯降噪
+	GaussianBlur(l_src, l_src, Size(9, 9), 2, 2);//高斯降噪
 	Mat cimg;
-	cvtColor(src, cimg, COLOR_RGB2GRAY);
+	cvtColor(l_src, cimg, COLOR_RGB2GRAY);
 
 	/* step 3: get bi-level img */
-	threshold(cimg, cimg, 100, 255, CV_THRESH_BINARY);
+	double l_ratio = g_ratio;
+	int temp = g_threshold;
+	temp = 190;
+	//temp = pBasicDemo->m_pcMyCamera->_threshold;
+	//l_ratio = pBasicDemo->m_pcMyCamera->_ratio;
+	threshold(cimg, cimg, temp, 255, CV_THRESH_BINARY);
 	imshow("threshold", cimg);
 
 	/* step 4: edge extraction */
@@ -314,78 +363,142 @@ Status CBasicDemoDlg::DisplayWindowInitial(void)
 	Canny(cimg, cimg, canny_threshold, canny_radio * canny_threshold, 5);
 	imshow("canny", cimg);
 
+	double sub_pixel = 2 / scale;
+	cv::resize(cimg, cimg, cv::Size(cimg.cols*sub_pixel, cimg.rows*sub_pixel), 0, 0, cv::INTER_NEAREST);
+
 	/* step 5: circle detection */
 	vector<Vec3f> circles;
-	HoughCircles(cimg, circles, HOUGH_GRADIENT, 1, cimg.rows / 8, canny_threshold * 2, 20, 30, 80);
-
+	HoughCircles(cimg, circles, HOUGH_GRADIENT, 1, cimg.rows / 8, canny_threshold * 2, 20, cimg.rows / 8, cimg.rows / 2.5);
+	int l_radius = 0;
 	for (size_t i = 0; i < circles.size(); i++)
 	{
-		Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-		int radius = cvRound(circles[i][2]);
+		Point center(cvRound(circles[i][0] / sub_pixel), cvRound(circles[i][1] / sub_pixel));
+		int radius = cvRound(circles[i][2] / sub_pixel);
 		//绘制圆心
-		circle(src, center, 3, Scalar(0, 255, 0), -1, 8, 0);
+		circle(l_src, center, 3, Scalar(0, 255, 0), -1, 8, 0);
 		//绘制圆轮廓
-		circle(src, center, radius, Scalar(155, 50, 255), 3, 8, 0);
+		circle(l_src, center, radius, Scalar(155, 50, 255), 3, 8, 0);
+		l_radius = radius;
 	}
 
 	/* step 6: line detection */
 	vector<Vec4i> lines;
-	HoughLinesP(cimg, lines, 1, CV_PI / 180, 50, 50, 10);
+	HoughLinesP(cimg, lines, 0.5, CV_PI / 360, 100, cimg.rows / 1.5, cimg.rows / 3);
+	Vec4i line1 = lines[0];
+	Vec4i line2;
+	Vec4i line3;
+	double k1 = (double)(line1[1] - line1[3]) / (double)(line1[0] - line1[2]);
+	double k2 = 0, k3 = 0, length1 = 0, length2 = 0, length3 = 0, lengthi;
+	length1 = sqrt(powf((lines[1][0] - lines[1][2]), 2) + powf((lines[1][1] - lines[1][3]), 2));
 	for (size_t i = 0; i < lines.size(); i++)
 	{
 		Vec4i l = lines[i];
-		line(src, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 3, CV_AA);
+		line(l_src, Point(l[0] / sub_pixel, l[1] / sub_pixel), Point(l[2] / sub_pixel, l[3] / sub_pixel), Scalar(0, 0, 255), 3, CV_AA);
+
+		/*分析三条线*/
+		double ki = (double)(lines[i][1] - lines[i][3]) / (double)(lines[i][0] - lines[i][2]);
+		lengthi = sqrt(powf((lines[i][0] - lines[i][2]), 2) + powf((lines[i][1] - lines[i][3]), 2));
+		/*修改滤波方案*/
+		if (abs(abs(ki / k1) - 1) < 0.1 && length1 < lengthi)
+		{
+			k1 = ki;
+			length1 = lengthi;
+			line1 = lines[i];
+		}
+		else if ((abs(abs(ki / k2) - 1) < 0.1 || k2 == 0) && length2 < lengthi)
+		{
+			k2 = ki;
+			length2 = lengthi;
+			line2 = lines[i];
+		}
+		else if ((abs(abs(ki / k3) - 1) < 0.1 || k3 == 0) && length3 < lengthi)
+		{
+			k3 = ki;
+			length3 = lengthi;
+			line3 = lines[i];
+		}
 	}
 
-	cv::imshow("result", src);
+	/*绘制得到的三条线*/
+	line(l_src, Point(line1[0] / sub_pixel, line1[1] / sub_pixel), Point(line1[2] / sub_pixel, line1[3] / sub_pixel), Scalar(255, 0, 0), 5, CV_AA);
+	line(l_src, Point(line2[0] / sub_pixel, line2[1] / sub_pixel), Point(line2[2] / sub_pixel, line2[3] / sub_pixel), Scalar(255, 0, 0), 5, CV_AA);
+	line(l_src, Point(line3[0] / sub_pixel, line3[1] / sub_pixel), Point(line3[2] / sub_pixel, line3[3] / sub_pixel), Scalar(255, 0, 0), 5, CV_AA);
+	//cout << "直线1两点(" << line1[0] << "," << line1[1] << ") , (" << line1[2] << "," << line1[3] << ");  k=" << k1 << endl;
+	//cout << "直线2两点(" << line2[0] << "," << line2[1] << ") , (" << line2[2] << "," << line2[3] << ");  k=" << k2 << endl;
+	//cout << "直线3两点(" << line3[0] << "," << line3[1] << ") , (" << line3[2] << "," << line3[3] << ");  k=" << k3 << endl;
 
+	/*绘制交点*/
+	Point2f p1, p2, p3;
+	p1.x = (k1*line1[0] - line1[1] - k2 * line2[0] + line2[1]) / (k1 - k2) / sub_pixel;
+	p1.y = (k1*k2*(line1[0] - line2[0]) + k1 * line2[1] - k2 * line1[1]) / (k1 - k2) / sub_pixel;
+	p2.x = (k1*line1[0] - line1[1] - k3 * line3[0] + line3[1]) / (k1 - k3) / sub_pixel;
+	p2.y = (k1*k3*(line1[0] - line3[0]) + k1 * line3[1] - k3 * line1[1]) / (k1 - k3) / sub_pixel;
+	p3.x = (k2*line2[0] - line2[1] - k3 * line3[0] + line3[1]) / (k2 - k3) / sub_pixel;
+	p3.y = (k2*k3*(line2[0] - line3[0]) + k2 * line3[1] - k3 * line2[1]) / (k2 - k3) / sub_pixel;
+	circle(l_src, p1, 6, Scalar(255, 0, 0), 3);
+	circle(l_src, p2, 6, Scalar(255, 0, 0), 3);
+	circle(l_src, p3, 6, Scalar(255, 0, 0), 3);
+
+	cv::imshow("result", l_src);
 	/* step 7: write output */
 	ofstream fout;
-	while (1) {
-		if (char status = cv::waitKey(0))
+	if (char status = cv::waitKey(0))
+	{
+		switch (status)
 		{
-			switch (status)
+		case 's':
+			fout.open("result.txt", ios::out | ios::app);
+			if (!fout)
 			{
-			case 's':
-				fout.open("result.txt", ios::out | ios::app);
-				if (!fout)
-				{
-					std::cout << "openning failed!!!" << '\n';
-				}
-
-				fout << "measurement: " << '\n';
-				fout << "--------------------------------" << '\n';
-				fout << "detect " << circles.size() << " circle(s) as following" << '\n';
-				for (size_t i = 0; i < circles.size(); i++)
-				{
-					Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-					int radius = cvRound(circles[i][2]);
-					fout << "circle " << i << ": center is " << center << " radius is " << radius << '\n';
-				}
-				fout << "detected " << lines.size() << " lines as following" << '\n';
-				for (size_t i = 0; i < lines.size(); i++)
-				{
-					Vec4i l = lines[i];
-					fout << "line " << i << " point 1 is (" << l[0] << "," << l[1] << ")" << '\n';
-					fout << "      " << " point 2 is (" << l[2] << "," << l[3] << ")" << '\n';
-				}
-				fout << "measurement finished" << '\n';
-				fout << "--------------------------------" << '\n';
-				fout << '\n';
-				fout.close();
-				cv::destroyAllWindows();
-				break;
-			default:
-				cv::destroyAllWindows();
-				break;
+				std::cout << "openning failed!!!" << '\n';
 			}
+
+			fout << "measurement: " << '\n';
+			fout << "--------------------------------" << '\n';
+			fout << "detect " << circles.size() << " circle(s)" << '\n';
+			fout << "detected " << lines.size() << " lines" << '\n';
+
+			/*计算三条边长以及圆心到边的距离*/
+			double length12, length13, length23, h1, h2, h3;
+			length12 = sqrt(powf((p1.x - p2.x), 2) + powf((p1.y - p2.y), 2)) / sub_pixel;
+			length13 = sqrt(powf((p1.x - p3.x), 2) + powf((p1.y - p3.y), 2)) / sub_pixel;
+			length23 = sqrt(powf((p3.x - p2.x), 2) + powf((p3.y - p2.y), 2)) / sub_pixel;
+			double A, B, C;
+			/*h1*/
+			A = line1[1] - line1[3];
+			B = line1[2] - line1[0];
+			C = line1[0] * line1[3] - line1[1] * line1[2];
+			h1 = ((double)abs(A*circles[0][0] + B * circles[0][1])) / ((double)sqrtf(A*A + B * B)) / sub_pixel;
+			/*h2*/
+			A = line2[1] - line2[3];
+			B = line2[2] - line2[0];
+			C = line2[0] * line2[3] - line2[1] * line2[2];
+			h2 = ((double)abs(A*circles[0][0] + B * circles[0][1])) / ((double)sqrtf(A*A + B * B)) / sub_pixel;
+			/*h3*/
+			A = line3[1] - line3[3];
+			B = line3[2] - line3[0];
+			C = line3[0] * line3[3] - line3[1] * line3[2];
+			h3 = ((double)abs(A*circles[0][0] + B * circles[0][1])) / ((double)sqrtf(A*A + B * B)) / sub_pixel;
+
+			/*输出计算结果*/
+			fout << "edge length is respectfully:" << length12 / l_ratio << "mm, " << length13 / l_ratio << "mm, " << length23 / l_ratio << "mm." << '\n';
+			fout << "circle center to edges height are: " << h1 / l_ratio << "mm, " << h2 / l_ratio << "mm, " << h3 / l_ratio << "mm." << '\n';
+			fout << "radius is: " << l_radius / l_ratio * 5 << "mm" << '\n';
+			fout << "measurement finished" << '\n';
+			fout << "--------------------------------" << '\n';
+			fout << '\n';
+			fout.close();
+			cv::destroyAllWindows();
+			//pBasicDemo->MessageBox(TEXT("测量已记录"), TEXT("成功"), MB_OK | MB_ICONWARNING);
+			break;
+		default:
+			cv::destroyAllWindows();
+			//pBasicDemo->MessageBox(TEXT("测量未记录"), TEXT("成功"), MB_OK | MB_ICONWARNING);
 			break;
 		}
 	}
-	/* test code end-----------------------------------------------------*/
 #else
 #endif
-	EnableWindowWhenClose();
 	return STATUS_OK;
 }
 
@@ -419,6 +532,7 @@ Status CBasicDemoDlg::OpenDevice(void)
 	}
 
 	m_pcMyCamera = new CMyCamera;
+	m_pcMyCamera->_threshold = 100;
 	/*创建设备失败*/
 	if (NULL == m_pcMyCamera)
 	{
@@ -451,6 +565,7 @@ Status CBasicDemoDlg::OpenDevice(void)
 // 关闭设备
 Status CBasicDemoDlg::CloseDevice(void)
 {
+	cv::destroyAllWindows();
 	int nRet = MV_OK;
 	if (FALSE == m_bCreateDevice || FALSE == m_bOpenDevice)
 	{
@@ -580,6 +695,22 @@ Status CBasicDemoDlg::SetExposureTime(void)
 		return STATUS_ERROR;
 	}
 
+	UpdateData(FALSE);
+
+	return STATUS_OK;
+}
+
+Status CBasicDemoDlg::SetThreshold(void)
+{
+	m_pcMyCamera->_threshold = m_dFrameRateEdit3;
+	UpdateData(FALSE);
+
+	return STATUS_OK;
+}
+
+Status CBasicDemoDlg::SetRatio(void)
+{
+	m_pcMyCamera->_ratio = m_dFrameRateEdit2;
 	UpdateData(FALSE);
 
 	return STATUS_OK;
@@ -719,14 +850,13 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 	if (pFrameInfo)
 	{
 		CBasicDemoDlg *pBasicDemo = (CBasicDemoDlg*)pUser;
-		cv::Mat src;
 		if (MV_Image_Undefined == pBasicDemo->m_nSaveImageType || NULL == pData)
 		{
 			return;
 		}
 		// 设置对应的相机参数
 
-		pBasicDemo->MessageBox(TEXT("imageCallBack"));
+		//pBasicDemo->MessageBox(TEXT("imageCallBack"));
 
 		// 仅在第一次保存图像时申请缓存，在 CloseDevice 时释放
 		if (NULL == pBasicDemo->m_pBufForSaveImage)
@@ -740,6 +870,8 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 				return;
 			}
 		}
+		/* step 0: read img data */
+		src = cv::Mat(pFrameInfo->nHeight, pFrameInfo->nWidth, CV_8UC3, pData);
 
 		MV_SAVE_IMAGE_PARAM_EX stParam = { 0 };
 		stParam.enImageType = pBasicDemo->m_nSaveImageType; // 需要保存的图像类型
@@ -763,21 +895,23 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 		}
 		if (MV_Image_Bmp == stParam.enImageType)
 		{
-			/* step 0: read img data */
-			src = cv::Mat(pFrameInfo->nHeight, pFrameInfo->nWidth, CV_8UC3, pData);
-			//cv::Mat src = cv::imread("D:\\curricula\\测试\\课程设计-视觉测量\\示例图片\\1.bmp");
-
+			Rect area(src.cols / 5, src.rows / 6, src.cols / 1.5, src.rows / 1.5);
+			cv::Mat l_src = src(area);
 			/* step 1: resize for calc efficiency */
 			double scale = 0.2;
-			cv::resize(src, src, cv::Size(src.cols*scale, src.rows*scale), 0, 0, cv::INTER_NEAREST);
+			cv::resize(l_src, l_src, cv::Size(l_src.cols*scale, l_src.rows*scale), 0, 0, cv::INTER_NEAREST);
 
 			/* step 2: gaussian filter */
-			GaussianBlur(src, src, Size(9, 9), 2, 2);//高斯降噪
+			GaussianBlur(l_src, l_src, Size(9, 9), 2, 2);//高斯降噪
 			Mat cimg;
-			cvtColor(src, cimg, COLOR_RGB2GRAY);
+			cvtColor(l_src, cimg, COLOR_RGB2GRAY);
 
 			/* step 3: get bi-level img */
-			threshold(cimg, cimg, 100, 255, CV_THRESH_BINARY);
+			double l_ratio = g_ratio;
+			int temp = g_threshold;
+			temp = pBasicDemo->m_pcMyCamera->_threshold;
+			l_ratio = pBasicDemo->m_pcMyCamera->_ratio;
+			threshold(cimg, cimg, temp, 255, CV_THRESH_BINARY);
 			imshow("threshold", cimg);
 
 			/* step 4: edge extraction */
@@ -786,31 +920,73 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 			Canny(cimg, cimg, canny_threshold, canny_radio * canny_threshold, 5);
 			imshow("canny", cimg);
 
+			double sub_pixel = 2 / scale;
+			cv::resize(cimg, cimg, cv::Size(cimg.cols*sub_pixel, cimg.rows*sub_pixel), 0, 0, cv::INTER_NEAREST);
+
 			/* step 5: circle detection */
 			vector<Vec3f> circles;
-			HoughCircles(cimg, circles, HOUGH_GRADIENT, 1, cimg.rows / 8, canny_threshold * 2, 20, 30, 80);
-
+			HoughCircles(cimg, circles, HOUGH_GRADIENT, 1, cimg.rows / 8, canny_threshold * 2, 20, cimg.rows / 8, cimg.rows / 2.5);
+			int l_radius = 0;
 			for (size_t i = 0; i < circles.size(); i++)
 			{
-				Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-				int radius = cvRound(circles[i][2]);
+				Point center(cvRound(circles[i][0] / sub_pixel), cvRound(circles[i][1] / sub_pixel));
+				int radius = cvRound(circles[i][2] / sub_pixel);
 				//绘制圆心
-				circle(src, center, 3, Scalar(0, 255, 0), -1, 8, 0);
+				circle(l_src, center, 3, Scalar(0, 255, 0), -1, 8, 0);
 				//绘制圆轮廓
-				circle(src, center, radius, Scalar(155, 50, 255), 3, 8, 0);
+				circle(l_src, center, radius, Scalar(155, 50, 255), 3, 8, 0);
+				l_radius = radius;
 			}
 
 			/* step 6: line detection */
 			vector<Vec4i> lines;
-			HoughLinesP(cimg, lines, 1, CV_PI / 180, 50, 50, 10);
+			HoughLinesP(cimg, lines, 1, CV_PI / 180, 50, cimg.rows / 6, cimg.rows/10);
+			Vec4i line1 = lines[0];
+			Vec4i line2;
+			Vec4i line3;
+			double k1 = (double)(line1[1] - line1[3]) / (double)(line1[0] - line1[2]);
+			double k2 = 0, k3 = 0;
 			for (size_t i = 0; i < lines.size(); i++)
 			{
 				Vec4i l = lines[i];
-				line(src, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0, 0, 255), 3, CV_AA);
+				line(l_src, Point(l[0] / sub_pixel, l[1] / sub_pixel), Point(l[2] / sub_pixel, l[3] / sub_pixel), Scalar(0, 0, 255), 3, CV_AA);
+
+				/*分析三条线*/
+				double ki = (double)(lines[i][1] - lines[i][3]) / (double)(lines[i][0] - lines[i][2]);
+				/*粗略地选择斜率不同的三条直线，需要优化*/
+				if (abs(ki / k1) < 0.9 || abs(ki / k1) > 1.1 && k2 == 0)
+				{
+					k2 = ki;
+					line2 = lines[i];
+				}
+				else if ((abs(ki / k1) < 0.9 || abs(ki / k1) > 1.1) && (abs(ki / k2) < 0.9 || abs(ki / k2) > 1.1))
+				{
+					k3 = ki;
+					line3 = lines[i];
+				}
 			}
 
-			cv::imshow("result", src);
+			/*绘制得到的三条线*/
+			line(l_src, Point(line1[0] / sub_pixel, line1[1] / sub_pixel), Point(line1[2] / sub_pixel, line1[3] / sub_pixel), Scalar(255, 0, 0), 5, CV_AA);
+			line(l_src, Point(line2[0] / sub_pixel, line2[1] / sub_pixel), Point(line2[2] / sub_pixel, line2[3] / sub_pixel), Scalar(255, 0, 0), 5, CV_AA);
+			line(l_src, Point(line3[0] / sub_pixel, line3[1] / sub_pixel), Point(line3[2] / sub_pixel, line3[3] / sub_pixel), Scalar(255, 0, 0), 5, CV_AA);
+			//cout << "直线1两点(" << line1[0] << "," << line1[1] << ") , (" << line1[2] << "," << line1[3] << ");  k=" << k1 << endl;
+			//cout << "直线2两点(" << line2[0] << "," << line2[1] << ") , (" << line2[2] << "," << line2[3] << ");  k=" << k2 << endl;
+			//cout << "直线3两点(" << line3[0] << "," << line3[1] << ") , (" << line3[2] << "," << line3[3] << ");  k=" << k3 << endl;
 
+			/*绘制交点*/
+			Point2f p1, p2, p3;
+			p1.x = (k1*line1[0] - line1[1] - k2 * line2[0] + line2[1]) / (k1 - k2) / sub_pixel;
+			p1.y = (k1*k2*(line1[0] - line2[0]) + k1 * line2[1] - k2 * line1[1]) / (k1 - k2) / sub_pixel;
+			p2.x = (k1*line1[0] - line1[1] - k3 * line3[0] + line3[1]) / (k1 - k3) / sub_pixel;
+			p2.y = (k1*k3*(line1[0] - line3[0]) + k1 * line3[1] - k3 * line1[1]) / (k1 - k3) / sub_pixel;
+			p3.x = (k2*line2[0] - line2[1] - k3 * line3[0] + line3[1]) / (k2 - k3) / sub_pixel;
+			p3.y = (k2*k3*(line2[0] - line3[0]) + k2 * line3[1] - k3 * line2[1]) / (k2 - k3) / sub_pixel;
+			circle(l_src, p1, 6, Scalar(255, 0, 0), 3);
+			circle(l_src, p2, 6, Scalar(255, 0, 0), 3);
+			circle(l_src, p3, 6, Scalar(255, 0, 0), 3);
+
+			cv::imshow("result", l_src);
 			/* step 7: write output */
 			ofstream fout;
 			if (char status = cv::waitKey(0))
@@ -826,37 +1002,68 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 
 					fout << "measurement: " << '\n';
 					fout << "--------------------------------" << '\n';
-					fout << "detect " << circles.size() << " circle(s) as following" << '\n';
-					for (size_t i = 0; i < circles.size(); i++)
-					{
-						Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-						int radius = cvRound(circles[i][2]);
-						fout << "circle " << i << ": center is " << center << " radius is " << radius << '\n';
-					}
-					fout << "detected " << lines.size() << " lines as following" << '\n';
-					for (size_t i = 0; i < lines.size(); i++)
-					{
-						Vec4i l = lines[i];
-						fout << "line " << i << " point 1 is (" << l[0] << "," << l[1] << ")" << '\n';
-						fout << "      " << " point 2 is (" << l[2] << "," << l[3] << ")" << '\n';
-					}
+					//fout << "detect " << circles.size() << " circle(s) as following" << '\n';
+					//for (size_t i = 0; i < circles.size(); i++)
+					//{
+					//	Point center(cvRound(circles[i][0]/sub_pixel), cvRound(circles[i][1]/sub_pixel));
+					//	int radius = cvRound(circles[i][2]/sub_pixel);
+					//	fout << "circle " << i << ": center is " << center << " radius is " << radius << '\n';
+					//}
+					//fout << "detected " << lines.size() << " lines as following" << '\n';
+					//for (size_t i = 0; i < lines.size(); i++)
+					//{
+					//	Vec4i l = lines[i];
+					//	fout << "line " << i << " point 1 is (" << l[0]/sub_pixel << "," << l[1]/sub_pixel << ")" << '\n';
+					//	fout << "      " << " point 2 is (" << l[2]/sub_pixel << "," << l[3]/sub_pixel << ")" << '\n';
+					//}
+					fout << "直线1，2交点：" << p1 << '\n';
+					fout << "直线1，3交点：" << p2 << '\n';
+					fout << "直线2，3交点：" << p3 << '\n';
+
+					/*计算三条边长以及圆心到边的距离*/
+					double length12, length13, length23, h1, h2, h3;
+					length12 = sqrt(powf((p1.x - p2.x), 2) + powf((p1.y - p2.y), 2)) / sub_pixel;
+					length13 = sqrt(powf((p1.x - p3.x), 2) + powf((p1.y - p3.y), 2)) / sub_pixel;
+					length23 = sqrt(powf((p3.x - p2.x), 2) + powf((p3.y - p2.y), 2)) / sub_pixel;
+					double A, B, C;
+					/*h1*/
+					A = line1[1] - line1[3];
+					B = line1[2] - line1[0];
+					C = line1[0] * line1[3] - line1[1] * line1[2];
+					h1 = ((double)abs(A*circles[0][0] + B * circles[0][1])) / ((double)sqrtf(A*A + B * B)) / sub_pixel;
+					/*h2*/
+					A = line2[1] - line2[3];
+					B = line2[2] - line2[0];
+					C = line2[0] * line2[3] - line2[1] * line2[2];
+					h2 = ((double)abs(A*circles[0][0] + B * circles[0][1])) / ((double)sqrtf(A*A + B * B)) / sub_pixel;
+					/*h3*/
+					A = line3[1] - line3[3];
+					B = line3[2] - line3[0];
+					C = line3[0] * line3[3] - line3[1] * line3[2];
+					h3 = ((double)abs(A*circles[0][0] + B * circles[0][1])) / ((double)sqrtf(A*A + B * B)) / sub_pixel;
+					
+					/*输出计算结果*/
+					fout << "三条边长分别为：" << length12/l_ratio << "单位, " << length13/l_ratio << "单位, " << length23/l_ratio << "单位." << '\n';
+					fout << "圆心到三条边距离为：" << h1/l_ratio << "单位， " << h2/l_ratio << "单位， " << h3/l_ratio<< "单位." << '\n';
+
 					fout << "measurement finished" << '\n';
 					fout << "--------------------------------" << '\n';
 					fout << '\n';
 					fout.close();
 					cv::destroyAllWindows();
-					pBasicDemo->MessageBox(TEXT("测量已记录"), TEXT("成功"), MB_OK | MB_ICONWARNING);
+					//pBasicDemo->MessageBox(TEXT("测量已记录"), TEXT("成功"), MB_OK | MB_ICONWARNING);
 					break;
 				default:
 					cv::destroyAllWindows();
-					pBasicDemo->MessageBox(TEXT("测量未记录"), TEXT("成功"), MB_OK | MB_ICONWARNING);
+					//pBasicDemo->MessageBox(TEXT("测量未记录"), TEXT("成功"), MB_OK | MB_ICONWARNING);
 					break;
 				}
 			}
 		}
 		else if (MV_Image_Jpeg == stParam.enImageType)
 		{
-			sprintf_s(pImageName, 20, "%03d.jpg", pFrameInfo->nFrameNum);
+			sprintf_s(pImageName, 20, "%03d.jpg", g_imgNumber);
+			g_imgNumber++;
 			pBasicDemo->m_nSaveImageType = MV_Image_Undefined;
 			FILE* fp = fopen(pImageName, "wb");
 			if (NULL == fp)
@@ -868,6 +1075,23 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 			fclose(fp);
 
 			pBasicDemo->MessageBox(TEXT("保存成功"), TEXT("成功"), MB_OK | MB_ICONWARNING);
+		}
+		else if (MV_Image_Png == stParam.enImageType)
+		{
+			/// Initialize values
+			alpha_slider = 0;
+
+			/// Create Windows
+			namedWindow("Threshold for bi-level img", 1);
+
+			/// Create Trackbars
+			char TrackbarName[50];
+			sprintf(TrackbarName, "Max %d", alpha_slider_max);
+
+			createTrackbar(TrackbarName, "Threshold", &alpha_slider, alpha_slider_max, on_trackbar);
+
+			/// Show some stuff
+			on_trackbar(alpha_slider, 0);
 		}
 	}
 }
@@ -1176,7 +1400,8 @@ void CBasicDemoDlg::OnBnClickedSetParameterButton()
 	{
 		MessageBox(TEXT("设置帧率失败"), TEXT("警告"), MB_OK | MB_ICONWARNING);
 	}
-
+	nRet = SetRatio();
+	nRet = SetThreshold();
 	MessageBox(TEXT("设置参数成功"), TEXT("警告"), MB_OK | MB_ICONWARNING);
 	return;
 }
@@ -1245,4 +1470,26 @@ BOOL CBasicDemoDlg::PreTranslateMessage(MSG* pMsg)
 
 
 	return CDialog::PreTranslateMessage(pMsg);
+}
+
+void CBasicDemoDlg::OnBnClickedSaveJpgButton2()
+{
+	src = imread("001.jpg");
+	
+	// Initialize values
+    alpha_slider = 0;
+    
+    /// Create Windows
+    namedWindow("Linear Blend", 1);
+    
+    /// Create Trackbars
+    char TrackbarName[50];
+    sprintf(TrackbarName, "Alpha x %d", alpha_slider_max);
+    
+    createTrackbar(TrackbarName, "Linear Blend", &alpha_slider, alpha_slider_max, on_trackbar);
+    
+    /// Show some stuff
+    on_trackbar(alpha_slider, 0);
+    waitKey(0);
+    destroyAllWindows();
 }
