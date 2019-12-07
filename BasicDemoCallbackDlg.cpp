@@ -21,7 +21,7 @@
 #else
 #pragma comment(lib,"opencv_world341.lib")
 #endif
-
+#define NUM 3
 using namespace cv;
 using namespace std;
 
@@ -33,8 +33,12 @@ int g_measNumber = 1;
 /// Global Variables
 const int alpha_slider_max = 255;
 int alpha_slider;
-double g_result[4][2];
-double g_output[10][6];
+
+double g_output[NUM][6];
+
+double g_sum[6];
+double avr[6];
+double stdvar[6];
 /// Matrices to store images
 Mat src;
 
@@ -148,6 +152,7 @@ void CBasicDemoDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Text(pDX, IDC_FRAME_RATE_EDIT, m_dFrameRateEdit);
 	DDX_Text(pDX, IDC_FRAME_RATE_EDIT2, m_dFrameRateEdit2);
 	DDX_Text(pDX, IDC_FRAME_RATE_EDIT3, m_dFrameRateEdit3);
+	DDX_Text(pDX, IDC_FRAME_RATE_EDIT4, m_dFrameRateEdit4);
 	DDX_Check(pDX, IDC_SOFTWARE_TRIGGER_CHECK, m_bSoftWareTriggerCheck);
 }
 
@@ -748,6 +753,14 @@ Status CBasicDemoDlg::SetRatio(void)
 	return STATUS_OK;
 }
 
+Status CBasicDemoDlg::SetCompensate(void)
+{
+	m_pcMyCamera->_compensate = m_dFrameRateEdit4;
+	UpdateData(FALSE);
+
+	return STATUS_OK;
+}
+
 // 获取增益
 Status CBasicDemoDlg::GetGain(void)
 {
@@ -928,7 +941,7 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 		if (MV_Image_Bmp == stParam.enImageType)
 		{
 			pBasicDemo->m_nSaveImageType = MV_Image_Undefined;
-			Rect area(src.cols / 20, src.rows / 20, src.cols / 1.25, src.rows / 1.25);
+			Rect area(src.cols / 8, src.rows / 8, src.cols / 1.25, src.rows / 1.25);
 			cv::Mat l_src = src(area);
 			/* step 1: resize for calc efficiency */
 			double scale = 0.2;
@@ -942,8 +955,10 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 			/* step 3: get bi-level img */
 			double l_ratio = 72.3;
 			int temp = 190;
+			double l_compensate = 1.0;
 			temp = pBasicDemo->m_pcMyCamera->_threshold;
 			l_ratio = pBasicDemo->m_pcMyCamera->_ratio;
+			l_compensate = pBasicDemo->m_pcMyCamera->_compensate;
 			cv::threshold(cimg, cimg, temp, 255, CV_THRESH_BINARY);
 			cv::imshow("threshold", cimg);
 
@@ -961,20 +976,17 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 			cv::HoughCircles(cimg, circles, HOUGH_GRADIENT, 1, cimg.rows / 8, canny_threshold * 2, 20, cimg.rows / 8, cimg.rows / 4);
 			int l_radius = 0;
 			Point center1(cvRound(circles[0][0] / sub_pixel), cvRound(circles[0][1] / sub_pixel));
-			for (size_t i = 0; i < circles.size(); i++)
-			{
-				Point center(cvRound(circles[i][0] / sub_pixel), cvRound(circles[i][1] / sub_pixel));
-				int radius = cvRound(circles[i][2] / sub_pixel);
-				//绘制圆心
-				cv::circle(l_src, center, 3, Scalar(0, 255, 0), -1, 8, 0);
-				//绘制圆轮廓
-				cv::circle(l_src, center, radius, Scalar(155, 50, 255), 0.1, 8, 0);
-				l_radius = radius;
-			}
+			Point center(cvRound(circles[0][0] / sub_pixel), cvRound(circles[0][1] / sub_pixel));
+			int radius = cvRound(circles[0][2] / sub_pixel);
+			//绘制圆心
+			cv::circle(l_src, center, 3, Scalar(0, 255, 0), -1, 8, 0);
+			//绘制圆轮廓
+			cv::circle(l_src, center, radius, Scalar(155, 50, 255), 0.1, 8, 0);
+			l_radius = radius;
 
 			/* step 6: line detection */
 			vector<Vec4i> lines;
-			cv::HoughLinesP(cimg, lines, 0.5, CV_PI / 360, 50, cimg.rows / 1.5, cimg.rows / 6);
+			cv::HoughLinesP(cimg, lines, 0.5, CV_PI / 360/2, 50, cimg.rows / 1.5, cimg.rows / 6);
 			Vec4i line1 = lines[0];
 			Vec4i line2;
 			Vec4i line3;
@@ -1146,13 +1158,27 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 				switch (status)
 				{
 				case 's':
-					/*计算平均值*/
-					for (int i = 0; i < 4; i++)
-					{
-						for (int j = 0; j < 2; j++)
-						{
-							g_result[i][j] += result[i][j];
-						}
+					double a;
+					double b;
+					double c;
+					double d;
+					double e;
+					double f;
+					
+					a = result[1][0] / l_ratio * 50 * l_compensate;
+					b = result[2][0] / l_ratio * 50 * l_compensate;
+					c = result[0][1];
+					d = result[0][0] / l_ratio * 50 * 2;
+					e = result[1][1] / l_ratio * 50 * l_compensate;
+					f = result[2][1] / l_ratio * 50 * l_compensate;
+
+					if (g_measNumber <= NUM) {
+						g_output[g_measNumber - 1][0] = a;
+						g_output[g_measNumber - 1][1] = b;
+						g_output[g_measNumber - 1][2] = c;
+						g_output[g_measNumber - 1][3] = d;
+						g_output[g_measNumber - 1][4] = e;
+						g_output[g_measNumber - 1][5] = f;
 					}
 					
 					fout.open("result.txt", ios::out | ios::app);
@@ -1167,23 +1193,42 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 					fout << "detected " << lines.size() << " lines" << '\n';
 
 					/*输出计算结果*/
-					fout << "edge length is respectfully:" << result[1][0] / l_ratio * 50 << "mm, " << result[2][0] / l_ratio * 50 << "mm, " << result[3][0] / l_ratio * 50 << "mm." << '\n';
-					fout << "circle center to edges height are: " << result[1][1] / l_ratio * 50 << "mm, " << result[2][1] / l_ratio * 50 << "mm, " << '\n';
-					fout << "radius is: " << result[0][0] / l_ratio * 50 << "mm" << '\n';
-					fout << "angle is: " << result[0][1] << '\n';
-					fout << "measurement finished" << '\n';
+					for (int i = 0; i < 6; i++)
+					{
+						fout<<g_output[g_measNumber - 1][i]<<' ';
+					}
+					fout << "\nmeasurement finished"<<'\n';
 					fout << "--------------------------------" << '\n';
 					fout << '\n';
 
-					if (g_measNumber == 10) {
-						for (int i = 0; i < 4; i++)
+					if (g_measNumber == NUM) {
+						/* mean */
+						for (int i = 0; i < NUM; i++)
 						{
-							for (int j = 0; j < 2; j++)
+							for (int j = 0; j < 6; j++)
 							{
-								g_result[i][j] /= g_measNumber;
+								g_sum[j] += g_output[i][j];
 							}
 						}
 						
+						for (int j = 0; j < 6; j++)
+						{
+							avr[j] = g_sum[j]/NUM;
+						}
+
+						for (int i = 0; i < NUM; i++)
+						{
+							for (int j = 0; j < 6; j++)
+							{
+								stdvar[j] += powf((g_output[i][j] - avr[j]), 2);
+							}
+						}
+
+						for (int j = 0; j < 6; j++)
+						{
+							stdvar[j] /= NUM - 1;
+							stdvar[j] = sqrt(stdvar[j]);
+						}
 
 						fout << "mean measurement" << '\n';
 						fout << "--------------------------------" << '\n';
@@ -1191,21 +1236,24 @@ void   __stdcall CBasicDemoDlg::ImageCallBack(unsigned char* pData, MV_FRAME_OUT
 						fout << "detected " << lines.size() << " lines" << '\n';
 
 						/*输出计算结果*/
-						fout << "edge length is respectfully:" << g_result[1][0] / l_ratio * 50 +0.3<< "mm, " << g_result[2][0] / l_ratio * 50 +0.3<< "mm, " << g_result[3][0] / l_ratio * 50 +0.3<< "mm." << '\n';
-						fout << "circle center to edges height are: " << g_result[1][1] / l_ratio * 50 +0.08<< "mm, " << g_result[2][1] / l_ratio * 50 +0.08<< "mm, " << '\n';
-						fout << "radius is: " << g_result[0][0] / l_ratio * 50 << "mm" << '\n';
-						fout << "angle is: " << g_result[0][1] << '\n';
+						fout << "a," << avr[0] << "," << stdvar[0] << '\n';
+						fout << "b," << avr[1] << "," << stdvar[1] << '\n';
+						fout << "c," << avr[2] << "," << stdvar[2] << '\n';
+						fout << "d," << avr[3] << "," << stdvar[3] << '\n';
+						fout << "e," << avr[4] << "," << stdvar[4] << '\n';
+						fout << "f," << avr[5] << "," << stdvar[5] << '\n';
 						fout << "measurement finished" << '\n';
 						fout << "--------------------------------" << '\n';
 						fout << '\n';
 						pBasicDemo->MessageBox(TEXT("测量已记录"), TEXT("成功"), MB_OK | MB_ICONWARNING);
+						
+						/*global var clear*/
 						g_measNumber = 0;
-						for (int i = 0; i < 4; i++)
+						for (int j = 0; j < 6; j++)
 						{
-							for (int j = 0; j < 2; j++)
-							{
-								g_result[i][j] = 0;
-							}
+							g_sum[j] = 0;
+							avr[j] = 0;
+							stdvar[j] = 0;
 						}
 					}
 					g_measNumber++;
@@ -1564,6 +1612,7 @@ void CBasicDemoDlg::OnBnClickedSetParameterButton()
 	}
 	nRet = SetRatio();
 	nRet = SetThreshold();
+	nRet = SetCompensate();
 	MessageBox(TEXT("设置参数成功"), TEXT("警告"), MB_OK | MB_ICONWARNING);
 	return;
 }

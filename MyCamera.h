@@ -79,6 +79,7 @@ public:
 
 	double _ratio;
 	double _threshold;
+	double _compensate;
 private:
 
     void*               m_hDevHandle;

@@ -38,6 +38,10 @@
 #define IDC_FRAME_RATE_EDIT3            1027
 #define IDC_FRAME_RATE_STATIC3          1028
 #define IDC_SAVE_JPG_BUTTON2            1029
+#define IDC_FRAME_RATE_EDIT4            1030
+#define IDC_FRAME_RATE_EDIT5            1031
+#define IDC_FRAME_RATE_STATIC4          1032
+#define IDC_FRAME_RATE_STATIC5          1033
 
 // Next default values for new objects
 // 

@@ -75,6 +75,7 @@ private:
 	double  m_dFrameRateEdit2;
 	CEdit   m_ctrlFrameRateEdit3;                // 帧率
 	double  m_dFrameRateEdit3;
+	double  m_dFrameRateEdit4;
     CButton m_ctrlGetParameterButton;           // 获取参数
     CButton m_ctrlSetParameterButton;           // 设置参数
 
@@ -103,6 +104,7 @@ private:
     Status SetExposureTime(void); 
 	Status SetRatio(void);
 	Status SetThreshold(void);
+	Status SetCompensate(void);
     Status GetGain(void);                       // 设置增益
     Status SetGain(void);
     Status GetFrameRate(void);                  // 设置帧率
